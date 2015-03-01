@@ -5,7 +5,7 @@ import Queue
 import numpy as np
 
 # Shares to try
-stocks = ['GOOGL']
+stocks = ['MSFT', 'AAPL']
 data = {}
 fromYear = '2010'
 fromMonth = '09'
@@ -45,11 +45,13 @@ for stock in stocks:
 
 longIdx = 0
 shortIdx = 0
-amountOfStocks = 0
+amountOfStocks = {}
+for stock in stocks:
+    amountOfStocks[stock] = 0
 
 print 'Running for ' + str(days) + ' days.'
 for i in range(0, days - 1):
-    print 'Day: ' + str(i) + ', Balance: $' + str(balance) + ', Stocks: ' + str(amountOfStocks)
+    print 'Day: ' + str(i) + ', Balance: $' + str(balance)
     for stock in stocks:
         ## MOVING AVERAGE
         closePrice = float(data[stock][i]['Close'])
@@ -65,16 +67,16 @@ for i in range(0, days - 1):
             if shortAvg > longAvg:
                 print 'BUY! (Long: ' + str(longAvg) + ', Short: ' + str(shortAvg) + ')'
                 if balance > 0 and balance > closePrice:
-                    if (balance - (closePrice * amountOfStocks)) > 0:
-                        amountOfStocks += int(balance / closePrice)
-                        balance -= closePrice * amountOfStocks
-                        print 'Bought ' + str(amountOfStocks) + ' shares at a cost of $' + str(closePrice) + ' each'
+                    if (balance - (closePrice * amountOfStocks[stock])) > 0:
+                        amountOfStocks[stock] += int(balance / closePrice)
+                        balance -= closePrice * amountOfStocks[stock]
+                        print 'Bought ' + str(amountOfStocks[stock]) + ' shares at a cost of $' + str(closePrice) + ' each'
             else:
                 print 'SELL! (Long: ' + str(longAvg) + ', Short: ' + str(shortAvg) + ')'
-                if amountOfStocks > 0:
-                    print 'Sold ' + str(amountOfStocks) + ' shares at a cost of $' + str(closePrice) + ' each'
-                    balance += amountOfStocks * closePrice
-                    amountOfStocks = 0
+                if amountOfStocks[stock] > 0:
+                    print 'Sold ' + str(amountOfStocks[stock]) + ' shares at a cost of $' + str(closePrice) + ' each'
+                    balance += amountOfStocks[stock] * closePrice
+                    amountOfStocks[stock] = 0
 
 
         longIdx += 1
@@ -85,11 +87,12 @@ for i in range(0, days - 1):
         if shortIdx == shortTime:
             shortIdx = 0
         ## END MOVING AVERAGE
-
-if amountOfStocks > 0:
-    print 'Sold ' + str(amountOfStocks) + ' shares at a cost of $' + str(closePrice)
-    balance += amountOfStocks * closePrice
-    amountOfStocks = 0
+for stock in stocks:
+    if amountOfStocks[stock] > 0:
+        closePrice = float(data[stock][len(data[stock] - 1)]['Price'])
+        print 'Sold ' + str(amountOfStocks[stock]) + ' ' + stock + ' shares at a cost of $' + str(closePrice)
+        balance += amountOfStocks[stock] * closePrice
+        amountOfStocks[stock] = 0
 
 print '________________________________'
 print 'Balance: ' + str(balance)
