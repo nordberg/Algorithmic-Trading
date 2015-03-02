@@ -55,23 +55,23 @@ for i in range(0, days - 1):
     for stock in stocks:
         ## MOVING AVERAGE
         closePrice = float(data[stock][i]['Close'])
-        longHist = hist_val[stock + 'long']
-        shortHist = hist_val[stock + 'short']
+        longHist = hist_val[stock + 'long'] # Long Time Period
+        shortHist = hist_val[stock + 'short'] # Short Time Period
         longHist[longIdx] = closePrice
         shortHist[shortIdx] = closePrice
 
-        ## Print the long and short moving average
+        # If we have enough data (Long Time Period is filled)
         if (longHist[longTime - 1]):
             longAvg = float(sum(longHist)/longTime)
             shortAvg = float(sum(shortHist)/shortTime)
-            if shortAvg > longAvg:
+            if shortAvg > longAvg: # Generate buy signal
                 print 'BUY! (Long: ' + str(longAvg) + ', Short: ' + str(shortAvg) + ')'
                 if balance > 0 and balance > closePrice:
                     if (balance - (closePrice * amountOfStocks[stock])) > 0:
                         amountOfStocks[stock] += int(balance / closePrice)
                         balance -= closePrice * amountOfStocks[stock]
                         print 'Bought ' + str(amountOfStocks[stock]) + ' shares at a cost of $' + str(closePrice) + ' each'
-            else:
+            else: # Generate sell signal
                 print 'SELL! (Long: ' + str(longAvg) + ', Short: ' + str(shortAvg) + ')'
                 if amountOfStocks[stock] > 0:
                     print 'Sold ' + str(amountOfStocks[stock]) + ' shares at a cost of $' + str(closePrice) + ' each'
@@ -82,11 +82,14 @@ for i in range(0, days - 1):
         longIdx += 1
         shortIdx += 1
 
+        # Stupid implementation of FIFO but whatever.
         if longIdx == longTime:
             longIdx = 0
         if shortIdx == shortTime:
             shortIdx = 0
         ## END MOVING AVERAGE
+
+# At the end of the time period, sell everything
 for stock in stocks:
     if amountOfStocks[stock] > 0:
         closePrice = float(data[stock][len(data[stock] - 1)]['Price'])
