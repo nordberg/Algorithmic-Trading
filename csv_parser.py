@@ -15,9 +15,6 @@ def getHistData(filename):
             day = {}
 
             if i > 1:
-                #for k in range(0, len(row) - 1):
-                    #row[k] = row[k].split(',')
-                #row = list(itertools.chain(*row))
                 for j in range(0, len(symbs) - 1):
                     day[symbs[j]] = row[j]
                 data.append(day)
